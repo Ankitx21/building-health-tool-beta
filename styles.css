@@ -1,0 +1,1445 @@
+* {
+  box-sizing: border-box;
+  font-family: "Segoe UI", sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #1f2f5c;
+  color: #e5e7eb;
+}
+
+.app-container {
+  max-width: 1200px;
+  margin: auto;
+  padding: 24px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 24px;
+}
+
+.header h1 {
+  margin-bottom: 6px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.card {
+  background: #2b3b73;
+  border-radius: 12px;
+  padding: 20px;
+}
+
+h2 {
+  margin-top: 0;
+  border-bottom: 1px solid #3f4f8c;
+  padding-bottom: 6px;
+}
+
+label {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+input, select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  margin-top: 4px;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 14px;
+}
+
+
+.inline {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 14px;
+  background: #7fb239;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #6aa32f;
+}
+
+.result-block {
+  background: #223162;
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+}
+
+.good {
+  color: #6ee7b7;
+}
+
+.bad {
+  color: #f87171;
+}
+
+.hidden {
+  display: none;
+}
+
+/* output secction css */
+
+.summary-metric {
+  margin-top: 10px;
+}
+
+.metric-value {
+  margin-top: 4px;
+  font-size: 15px;
+}
+
+.metric-good {
+  color: #6ee7b7;
+}
+
+.metric-bad {
+  color: #f87171;
+}
+
+/* KPI Row Layout */
+.kpi-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 12px 0;
+  gap: 16px;
+}
+
+/* Left side */
+
+
+.kpi-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  flex: 0 0 45%;   /* 👈 fixed proportion, does NOT grow */
+  min-width: 320px; /* 👈 safe minimum for titles */
+}
+
+
+.kpi-icon {
+  font-size: 1.1rem;
+  margin-top: 2px;
+}
+
+.kpi-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #e5e7eb;
+  flex-shrink: 0;
+}
+
+.kpi-ref {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #9ca3af;
+  margin-top: 2px;
+}
+
+/* Right side value */
+.kpi-right {
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: right;
+  white-space: normal;   /* ✅ FIX */
+  line-height: 1;
+}
+
+.kpi-right .separator {
+  margin: 0 6px;
+  opacity: 0.6;
+}
+
+.kpi-right .kpi-status {
+  margin-top: 4px;
+  font-weight: 600;
+}
+
+/* Status colors */
+.rating-excellent {
+  color: #2CBC33; /* green */
+}
+
+.rating-fair {
+  color: #facc15; /* amber */
+}
+
+.rating-poor {
+  color: #ef4444; /* red */
+}
+
+/* ===== Net Energy Status (text-only) ===== */
+
+.text-positive {
+  color: #22c55e; /* green */
+  font-weight: 600;
+}
+
+.text-neutral {
+  color: #b45309; /* amber */
+  font-weight: 600;
+}
+
+.text-negative {
+  color: #ef4444; /* red */
+  font-weight: 600;
+}
+
+
+.badge-positive {
+  color: #22c55e;
+}
+
+.badge-neutral {
+  color: #F7B980;
+}
+
+.badge-negative {
+  color: #ef4444;
+}
+
+.badge {
+  padding: 6px 12px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  display: inline-block;
+}
+
+.results-refresh {
+  animation: refreshFlash 0.6s ease;
+}
+
+@keyframes refreshFlash {
+  0%   { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* built up area - occupancy - ac conditioned */
+
+.form-row {
+  display: grid;
+  gap: 16px;
+}
+
+.form-row.two-col {
+  grid-template-columns: 1fr 1fr;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.field-label {
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.label-note {
+  font-size: 0.7rem;
+  color: #E6E6E6;
+  padding: 2px 1px;
+  border-radius: 999px;
+}
+
+/* Mobile friendly */
+@media (max-width: 768px) {
+  .form-row.two-col {
+    grid-template-columns: 1fr;
+  }
+}
+/* RESPONSIVE */
+@media (min-width: 900px) {
+  .main-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+
+/* hvac and elctrical and dg contract */
+
+.kpi-right{
+  margin-top: 17px;
+}
+
+.kpi-split {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.kpi-label {
+  font-size: 0.7rem;
+  color: #9ca3af;
+  margin-right: 6px;
+}
+
+.kpi-value {
+  font-weight: 600;
+}
+
+.kpi-status {
+  margin-top: 4px;
+  font-size: 0.8rem;
+}
+
+
+.kpi-note {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+
+
+
+/* Contract & DG numeric value colors */
+.kpi-value {
+  font-weight: 600;
+  color: #e5e7eb; /* default text */
+}
+
+/* When efficient */
+.rating-excellent .kpi-value {
+  color: #2CBC33; /* green */
+}
+
+/* When fair */
+.rating-fair .kpi-value {
+  color: #facc15; /* amber */
+}
+
+/* When poor */
+.rating-poor .kpi-value {
+  color: #ef4444; /* red */
+}
+
+/* Status text */
+.kpi-status.rating-excellent {
+  color: #2CBC33;
+}
+
+.kpi-status.rating-fair {
+  color: #facc15;
+}
+
+.kpi-status.rating-poor {
+  color: #ef4444;
+}
+
+
+
+/* ===== EPI BAR ===== */
+/* STAR SCALE */
+.epi-star-scale {
+  position: relative;
+  height: 56px;
+  margin-top: 5px;
+  width: 100%;
+}
+
+/* STAR GROUP = POSITION ANCHOR */
+.epi-star-group {
+  position: absolute;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;   /* ⭐ THIS ensures perfect alignment */
+}
+
+/* STAR ICON (TOP) */
+.star-icon {
+  font-size: 14px;
+  color: #ffffff;
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+/* TICK (CENTER) */
+.star-tick {
+  width: 3px;
+  height: 12px;
+  background: #c0392b;
+  margin-bottom: 4px;
+}
+
+/* NUMBER (BOTTOM) */
+.star-num {
+  font-size: 12px;
+  color: #ffffff;
+  line-height: 1;
+}
+
+/* ===== EPI BAR ===== */
+.epi-card {
+  background: #223463;
+  color: #fff;
+  padding: 24px;
+  border-radius: 14px;
+}
+
+.epi-sub {
+  opacity: 0.85;
+  margin-bottom: 18px;
+}
+
+/* wrapper */
+.epi-bar-wrapper {
+  position: relative;
+  margin-top: 28px;
+}
+
+/* SCALE ensures bar + stars share width */
+.epi-scale {
+  position: relative;
+}
+
+/* BAR */
+.epi-bar {
+  position: relative;
+  height: 34px;
+  border-radius: 10px;
+  background: #dcdcdc;
+  margin-top: 3.8rem;
+  overflow: hidden;
+}
+
+/* COLOR ZONES (unchanged) */
+.epi-fill {
+  height: 100%;
+  width: 0%;
+  background: #2ecc71
+}
+
+/* MARKERS */
+.epi-marker {
+  position: absolute;
+  top: -6px;
+  height: 46px;
+  width: 4px;
+}
+
+.assure-marker {
+  background: red;
+  border-left: 2px dashed red;
+}
+
+.building-marker {
+  background: black;
+}
+
+/* LABEL BOXES */
+.epi-label {
+  position: absolute;
+  top: -58px;
+  background: #fff;
+  color: #000;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  transform: translateX(-50%);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+  transition: top 0.2s ease;
+}
+
+.assure-label {
+  border-left: 4px solid red;
+}
+
+.building-label {
+  border-left: 4px solid black;
+}
+
+/* STAR TICKS (POSITIONED BY JS) */
+/* .star-tick {
+  position: absolute;
+  bottom: -6px;
+  width: 3px;
+  height: 12px;
+  background: #c0392b;
+  transform: translateX(-50%);
+} */
+
+
+/* STAR ROW */
+/* .epi-stars {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding: 0 6px;
+} */
+
+/* .epi-stars div {
+  width: 20%;
+  text-align: center;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+} */
+
+/* MESSAGE */
+.epi-message {
+  margin-top: 16px;
+  font-size: 15px;
+}
+
+
+/* STAR SCALE CONTAINER */
+/* .epi-star-scale {
+  position: relative;
+  height: 30px;
+  margin-top: 14px;
+  width: 100%;          
+} */
+
+
+/* EACH STAR + TICK GROUP */
+/* .epi-star-group {
+  position: absolute;
+  transform: translateX(-50%);
+  text-align: center;
+} */
+
+/* reuse your tick style */
+/* .epi-star-group .star-tick {
+  position: static;
+  margin: 0 auto 4px;
+} */
+
+/* reuse your star text style */
+/* .epi-star-group .star-label {
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+} */
+
+
+/* info hover button */
+
+/* Title row */
+.epi-title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+
+/* Info icon */
+.epi-info {
+  position: relative;
+  font-size: 14px;
+  cursor: pointer;
+  opacity: 0.85;
+  user-select: none;
+}
+
+/* Tooltip box */
+.epi-tooltip {
+  position: absolute;
+  bottom: 140%;
+  left: 50%;
+  transform: translateX(-50%);
+  background:white;          /* same card theme */
+  color: black;
+  font-size: 13px;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25);
+  z-index: 10;
+}
+
+/* Tooltip arrow */
+.epi-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px;
+  border-style: solid;
+  border-color: #223463 transparent transparent transparent;
+}
+
+/* Show tooltip on hover */
+.epi-info:hover .epi-tooltip {
+  opacity: 1;
+  transform: translateX(-50%) translateY(-4px);
+}
+
+
+
+/* for bee star ratng */
+
+/* ===============================
+   BEE STAR RATING (FINAL)
+================================ */
+
+/* Wrapper block */
+.bee-rating-block {
+  margin-bottom: 16px;
+}
+
+/* Title */
+.bee-rating-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+  opacity: 0.9;
+}
+
+/* Output container */
+.bee-rating-value {
+  margin-top: 10px;
+}
+
+/* Badge wrapper */
+.bee-rating-value .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 6px 10px;
+  /* background: rgba(255, 255, 255, 0.06); */
+  border-radius: 8px;
+}
+
+/* Stars container */
+.bee-stars {
+  display: flex;
+  gap: 14px;              /* ⭐ equal spacing */
+}
+
+/* Individual star */
+.bee-star {
+  font-size: 22px;
+  line-height: 1;
+  transition: color 0.25s ease;
+}
+
+/* Filled star */
+.bee-star.filled {
+  color: #f5c542;         /* Gold */
+}
+
+/* Empty star */
+.bee-star.empty {
+  color: rgba(245, 197, 66, 0.25);
+}
+
+/* "(X Star)" text */
+.bee-text {
+  font-size: 14px;
+  font-weight: 500;
+  color: #f5c542;
+  white-space: nowrap;
+}
+
+
+/* net energys attus */
+
+.net-energy-block {
+  margin-top: 12px;
+}
+
+.net-energy-title {
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+.net-energy-value {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Optional – improves readability */
+.badge-positive {
+  color: #2cbc33;
+}
+
+.badge-negative {
+  color: #c62828;
+}
+
+.badge-neutral {
+  color: #f9a825;
+}
+
+/* hvac contract demand */
+
+/* HVAC block */
+.hvac-block {
+  margin-top: 12px;
+}
+
+/* Title row */
+.hvac-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+  margin-bottom: 6px;
+}
+
+/* Value row */
+.hvac-value {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+/* Status colors (already using these classes) */
+.rating-excellent {
+  color: #2CBC33;
+}
+
+.rating-fair {
+  color: #f9a825;
+}
+
+.rating-poor {
+  color: #c62828;
+}
+
+/* ================= HVAC VISUAL BAR ================= */
+
+/* ================= HVAC CARD ================= */
+
+.hvac-card {
+  margin-top: 20px;
+  padding: 14px 0;
+}
+
+.hvac-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+
+/* ================= BAR WRAPPER ================= */
+
+.hvac-bar-wrapper {
+  position: relative;
+  margin-top: 20px;
+}
+
+
+/* ================= HVAC BAR ================= */
+
+.hvac-bar {
+  position: relative;
+  margin-top: 4rem;
+  height: 50px;
+  background: #e0e0e0;  
+  border-radius: 15px;
+  overflow: hidden;
+}
+
+
+/* Filled zone (blue → more cooling than needed) */
+.hvac-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  background: #3498db;
+  border-radius: 14px 0 0 14px;
+}
+
+
+/* ================= MARKERS ================= */
+
+/* Common marker base */
+.hvac-marker {
+  position: absolute;
+  top: 8px;
+  height: 34px;
+  transform: translateX(-50%);
+}
+
+
+/* Building marker (circle + dotted line) */
+/* Building marker (circle + dotted line) */
+.hvac-marker.building::before {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  width: 14px;
+  height: 14px;
+  background: var(--marker-color, #3498db);
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+.hvac-marker.building::after {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: 50%;
+  height: 22px;
+  border-left: 2px dashed var(--marker-color, #3498db);
+  transform: translateX(-50%);
+}
+
+
+
+/* Target marker (black circle + dotted stem) */
+.hvac-marker.target {
+  top: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hvac-marker.target .target-dot {
+  width: 16px;
+  height: 16px;
+  border: 3px solid #000;
+  border-radius: 50%;
+  background: #fff;
+  margin: 0 auto;
+}
+
+.hvac-marker.target::after {
+  content: "";
+  position: absolute;
+  top: 18px;
+  left: 50%;
+  height: 20px;
+  border-left: 2px dashed #000;
+  transform: translateX(-50%);
+}
+
+
+/* ================= TARGET LABEL ================= */
+
+.target-label {
+  position: absolute;
+  top: 60px; /* below 50px bar */
+  transform: translateX(-50%);
+  font-size: 12px;
+  text-align: center;
+  color: #ffffff;
+  white-space: nowrap;
+  opacity: 0.9;
+}
+
+
+
+/* ================= BUILDING FLOATING LABEL ================= */
+
+.hvac-building-label {
+  position: absolute;
+  top: -54px;
+  transform: translateX(-50%);
+  background: #0f2a4f;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  white-space: nowrap;
+}
+
+.hvac-building-label b {
+  color: #6dd5fa;
+  font-size: 13px;
+}
+
+
+/* ================= LEGEND ================= */
+
+.hvac-legend {
+  margin-top: 3rem;
+  font-size: 13px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.hvac-legend .lg {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.hvac-legend .blue {
+  color: #6dd5fa;
+}
+
+.hvac-legend .red {
+  color: #e74c3c;
+}
+
+.hvac-legend .green {
+  color: #2ecc71;
+}
+
+/* Target value below bar */
+
+.hvac-target-label {
+  position: absolute;
+  top: 60px;                 /* below 50px bar */
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.target-value {
+  position: absolute;
+  top: 100px;              /* push below 50px bar */
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 600;
+  color: blue;
+  white-space: nowrap;
+}
+
+
+
+/* ######################### Net energu bar ###################################3*/
+
+/* CARD */
+.net-energy-card {
+  margin-top: 24px;
+}
+
+.net-energy-title {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 12px;
+}
+
+/* BAR CONTAINER */
+.net-energy-bar {
+  width: 100%;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #e0e0e0;
+}
+
+/* EACH ROW */
+.net-energy-row {
+  position: relative;
+  height: 44px;                /* ✅ BIG ENOUGH FOR TEXT */
+  display: flex;
+  align-items: center;
+}
+
+/* FILLS */
+.net-bar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0%;
+  transition: width 0.6s ease;
+}
+
+.net-energy-consumed {
+  background: #ff4d4d;
+}
+
+.net-energy-generated {
+  background: #2ecc71;
+}
+
+/* TEXT (ALWAYS VISIBLE) */
+.net-bar-text {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  font-weight: 500;
+  color: #000;
+}
+
+/* MESSAGE */
+.net-energy-message {
+  margin-top: 10px;
+  font-size: 14px;
+}
+
+
+
+/* dg set sizing contract demand */
+
+/* ELECTRICAL (CONTRACT + DG) */
+.electrical-block {
+  margin-top: 14px;
+}
+
+.electrical-item {
+  margin-bottom: 14px;
+}
+
+.electrical-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  font-size: 14px;
+
+  margin-bottom: 6px;
+}
+
+.electrical-value {
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+
+
+
+
+/* ================= WATER CARD ================= */
+
+/* ================= WATER CARD ================= */
+
+.water-card {
+  margin-top: 20px;
+}
+
+.water-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+/* ================= WRAPPER ================= */
+
+.water-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 0px;
+}
+
+/* ================= SCALE ================= */
+
+.water-scale {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 300px;
+  margin-right: 5.5rem;
+}
+
+.scale-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #ffffff;
+}
+
+.scale-line {
+  width: 40px;
+  height: 2px;
+  background: #ffffff;
+  opacity: 0.5;
+}
+
+.scale-highlight span {
+  font-weight: 700;
+  color: #ffcc00;
+}
+
+/* ================= CYLINDER ================= */
+
+.water-cylinder {
+  position: relative;
+  width: 140px;
+  height: 300px;
+  background: linear-gradient(
+    to right,
+    #dcdcdc 0%,
+    #f2f2f2 50%,
+    #dcdcdc 100%
+  );
+  border-radius: 0 0 70px 70px;   /* flat top, round bottom */
+  overflow: hidden;
+}
+
+/* Top ellipse */
+.water-cylinder::before {
+  content: "";
+  position: absolute;
+  top: -18px;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  background: #e5e5e5;
+  border-radius: 50%;
+}
+
+/* Bottom ellipse */
+.water-cylinder::after {
+  content: "";
+  position: absolute;
+  bottom: -18px;
+  left: 0;
+  width: 100%;
+  height: 36px;
+  background: #bfbfbf;
+  border-radius: 50%;
+}
+
+/* ================= WATER CARD ================= */
+
+.water-card {
+  margin-top: 20px;
+}
+
+.water-title {
+  font-weight: 600;
+  margin-bottom: 14px;
+}
+
+/* ================= LAYOUT ================= */
+
+
+.water-wrapper {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 25px;   /* space between cylinder and scale */
+  flex-wrap: nowrap;
+}
+
+/* ================= SCALE ================= */
+
+.water-scale {
+  position: relative;
+  height: 100%;
+  min-width: 80px;
+}
+
+/* Scale rows positioned correctly */
+.scale-row {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+  font-size: 13px;
+}
+
+/* ================= SMALL PHONES ================= */
+@media (max-width: 0px) {
+
+  .water-wrapper {
+    flex-direction: column;   /* stack vertically */
+    align-items: center;
+    gap: 25px;
+    padding-right: 30px;
+  }
+
+  .water-scale {
+    position: relative;
+    width: 100%;
+    min-width: unset;
+    height: 120px;   /* compact scale */
+    margin-right: 0.1rem;
+  }
+
+  .scale-row {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .water-cylinder {
+    width: 140px;   /* slightly smaller */
+    height: 380px;  /* slightly smaller */
+  }
+
+  .water-actual-label {
+    font-size: 13px;
+  }
+}
+
+
+/* ================= RESPONSIVE BREAKPOINTS ================= */
+
+/* Small phones */
+@media (max-width: 480px) {
+
+  .water-wrapper {
+    gap: 20px;
+  }
+
+  .water-scale {
+    min-width: 55px;
+  }
+
+  .scale-row {
+    font-size: 11px;
+  }
+}
+
+/* Tablets */
+@media (min-width: 481px) and (max-width: 768px) {
+
+  .water-wrapper {
+    gap: 30px;
+  }
+
+  .water-scale {
+    min-width: 65px;
+  }
+}
+
+/* iPad / medium screens */
+@media (min-width: 769px) and (max-width: 1024px) {
+
+  .water-wrapper {
+    gap: 35px;
+  }
+
+  .water-scale {
+    min-width: 75px;
+  }
+}
+
+
+
+
+.scale-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #ffffff;
+  position: relative;
+}
+
+.scale-row {
+  position: absolute;
+  right: 0;
+  transform: translateY(50%);
+}
+
+
+.scale-line {
+  width: 40px;
+  height: 2px;
+  background: #aaa;
+}
+
+.scale-target span {
+  color: #ffcc00;
+  font-weight: 600;
+}
+
+.scale-label {
+  position: absolute;
+  left: 60px;
+  font-size: 12px;
+  color: #ffcc00;
+  white-space: nowrap;
+}
+
+/* ================= CYLINDER ================= */
+
+.water-cylinder {
+  position: relative;
+  width: 120px;
+  height: 320px;
+  background: linear-gradient(to right, #e6e6e6 0%, #f5f5f5 50%, #e6e6e6 100%);
+  border-radius: 60px 60px 0 0; /* flat bottom */
+  overflow: hidden;
+}
+
+/* 3D TOP */
+.water-cylinder::before {
+  content: "";
+  position: absolute;
+  top: -15px;
+  left: 0;
+  width: 100%;
+  height: 30px;
+  background: radial-gradient(ellipse at center, #f0f0f0 0%, #d9d9d9 100%);
+  border-radius: 50%;
+}
+
+/* BLUE WATER */
+.water-actual {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to right, #4da3c7 0%, #63b3d3 50%, #4da3c7 100%);
+}
+
+/* RED LIMIT LINE */
+.water-limit-band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: rgba(220, 53, 69, 0.9);
+}
+
+/* ================= ACTUAL LABEL ================= */
+
+.water-actual-label {
+  position: absolute;
+  left: 180px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #e92828;
+  /* transform: translateY(50%); */
+}
+
+/* grok css water cylider */
+
+/* ================= WATER MODULE ================= */
+
+.water-module {
+  margin-top: 30px;
+}
+
+/* Wrapper */
+.water-module .water-cylinder-wrapper {
+  position: relative;
+  width: 260px;
+  margin: 40px auto;
+}
+
+/* Cylinder */
+.water-module .water-cylinder {
+  width: 170px;
+  height: 460px;
+  margin: 0 auto;
+  position: relative;
+  background: #e5e7eb;
+  border-radius: 90px / 28px;
+  overflow: hidden;
+  box-shadow:
+    inset -30px 0 60px rgba(0,0,0,0.25),
+    inset 30px 0 60px rgba(255,255,255,0.35);
+}
+
+/* Top shine */
+.water-module .water-cylinder::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 8%;
+  right: 8%;
+  height: 40px;
+  background: radial-gradient(ellipse at center,
+              rgba(255,255,255,0.9) 10%, transparent 70%);
+  border-radius: 50%;
+  z-index: 5;
+}
+
+/* Water fill */
+.water-module .water-fill {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  background: linear-gradient(to top, #60a5fa, #3b82f6);
+  transition: height 1.2s ease;
+}
+
+/* NBC limit line */
+.water-module .water-limit-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: #dc2626;
+  box-shadow: 0 0 8px #f87171;
+}
+
+/* Scale */
+.water-module .water-scale {
+  position: absolute;
+  right: -10px;
+  top: 0;
+  height: 460px;
+  width: 110px;
+}
+
+.water-module .water-scale .scale-label {
+  position: absolute;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #ffffff;
+}
+
+/* Badge */
+.water-module .water-badge {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #1e3a8a;
+  color: white;
+  padding: 8px 18px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: bottom 1.2s ease;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
