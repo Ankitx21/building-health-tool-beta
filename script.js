@@ -439,39 +439,41 @@ const PF = 0.9;
 let demandSizing = {
   contract: "",
   dg: "",
-  status: MISSING_RESULT_TEXT,
-  class: "rating-fair"
+  cdWsf: NaN,
+  dgWsf: NaN,
+  contractStatus: MISSING_RESULT_TEXT,
+  dgStatus: MISSING_RESULT_TEXT,
+  contractClass: "rating-fair",
+  dgClass: "rating-fair"
 };
 
 if (areaSqft > 0) {
-
   const cdKW = !isNaN(contractDemandKVA) ? contractDemandKVA * PF : NaN;
   const dgKW = !isNaN(dgSize) ? dgSize * PF : NaN;
 
   const cdWsf = !isNaN(cdKW) ? (cdKW * 1000) / areaSqft : NaN;
   const dgWsf = !isNaN(dgKW) ? (dgKW * 1000) / areaSqft : NaN;
 
-  const cdOk = !isNaN(cdWsf) && cdWsf < 5;
-  const dgOk = !isNaN(dgWsf) && dgWsf < 5;
+  demandSizing.cdWsf = cdWsf;
+  demandSizing.dgWsf = dgWsf;
 
-  demandSizing.contract = !isNaN(cdWsf)
-    ? `${cdWsf.toFixed(2)} W/sqft`
-    : "Not provided";
-
-  demandSizing.dg = !isNaN(dgWsf)
-    ? `${dgWsf.toFixed(2)} W/sqft`
-    : "Not provided";
-
-  if (cdOk && dgOk) {
-    demandSizing.status = "Efficient";
-    demandSizing.class = "rating-excellent";
+  if (!isNaN(cdWsf)) {
+    demandSizing.contract = `${cdWsf.toFixed(2)} W/sqft`;
+    demandSizing.contractStatus = cdWsf < 5 ? "Efficient" : "Above target";
+    demandSizing.contractClass = cdWsf < 5 ? "rating-excellent" : "rating-poor";
   } else {
-    demandSizing.status = "Above target";
-    demandSizing.class = "rating-poor";
+    demandSizing.contract = "Not provided";
+  }
+
+  if (!isNaN(dgWsf)) {
+    demandSizing.dg = `${dgWsf.toFixed(2)} W/sqft`;
+    demandSizing.dgStatus = dgWsf < 5 ? "Efficient" : "Above target";
+    demandSizing.dgClass = dgWsf < 5 ? "rating-excellent" : "rating-poor";
+  } else {
+    demandSizing.dg = "Not provided";
   }
 }
 
-console.log("DEMAND DEBUG:", demandSizing);
 
 /* ================= LPCD CALCULATION ================= */
 let lpcd = NaN;
@@ -485,7 +487,7 @@ if (
   // Annual kL → litres
   const annualLitres = waterKL * 1000;
 
-  // LPCD calculation (220 working days)
+  // LPCD calcurflation (220 working days)
   lpcd = annualLitres / (occupants * 220);
 }
 
@@ -1037,6 +1039,146 @@ function buildDemandLine(d) {
   `;
 }
 
+function buildSizingDots(value, dotCount, colorA, colorB) {
+  let dotsHtml = "";
+  for (let i = 1; i <= dotCount; i++) {
+    const fill = Math.max(0, Math.min(1, value - (i - 1)));
+    const dotColor = i % 2 === 0 ? colorB : colorA;
+    dotsHtml += `<div class="dg-dot" style="--fill:${fill}; --dot-color:${dotColor};"></div>`;
+  }
+  return dotsHtml;
+}
+
+function renderDgSizingVisual(dgWsf) {
+  const root = document.getElementById("outDgSizing");
+  if (!root) return;
+
+  if (isNaN(dgWsf) || dgWsf < 0) {
+    root.innerHTML = `
+      <div class="dg-head section-heading">
+        <img class="section-icon" src="buildinge_health_tool_asset/dg-set-sizing.png" alt="DG Set Sizing">
+        <span class="dg-title section-title">DG set sizing (Target: &lt; 5 W/sqft):</span>
+      </div>
+      <div class="rating-fair">Result not available due to missing input(s).</div>
+    `;
+    return;
+  }
+
+  const TARGET = 5;
+  const DOT_COUNT = 13;
+
+  const AXIS_MAX = DOT_COUNT; // each circle = 1 W/sqft
+
+  const toPct = v => (v / AXIS_MAX) * 100;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  const scaledValue = clamp(dgWsf, 0, AXIS_MAX);
+  const valuePct = toPct(scaledValue);
+  const targetPct = clamp(toPct(TARGET), 0, 100);
+
+  // Anchor to dot centers so 0.0 sits on first circle (not second)
+  const firstDotPct = 100 / (DOT_COUNT * 2);   // center of first dot
+  const lastDotPct = 100 - firstDotPct;        // center of last dot
+  const bubblePct = clamp(valuePct, firstDotPct, lastDotPct);
+  const good = dgWsf <= TARGET;
+  const bubbleClass = good ? "dg-good" : "dg-bad";
+  const bubbleMsg = good ? "Right amount of backup power" : "More backup power than needed";
+  const lineColor = good ? "#25c46b" : "#ff4e63";
+
+  const dotsHtml = buildSizingDots(scaledValue, DOT_COUNT, "#f79a1f", "#f5b13c");
+
+  root.innerHTML = `
+    <div class="dg-head section-heading">
+        <img class="section-icon" src="buildinge_health_tool_asset/dg-set-sizing.png" alt="DG Set Sizing">
+        <span class="dg-title section-title">DG set sizing (Target: &lt; 5 W/sqft):</span>
+      </div>
+
+    <div class="dg-visual">
+      <div class="dg-bubble ${bubbleClass}" style="left:${bubblePct}%; --dg-line:${lineColor};">
+        <span class="s1">${bubbleMsg}</span>
+        <span class="s2">Your Building ${dgWsf.toFixed(1)} W/sqft</span>
+      </div>
+
+      <div class="dg-scale">
+        <div class="dg-dots">${dotsHtml}</div>
+        <div class="dg-target-marker" style="left:${targetPct}%;"></div>
+      </div>
+
+      <div class="dg-target-label" style="left:${targetPct}%;">
+        ASSURE Target &lt; 5 W/sqft
+      </div>
+    </div>
+  `;
+}
+
+// ///////////////////Contract demand//////////////////////////
+
+function renderContractSizingVisual(cdWsf) {
+  const root = document.getElementById("outContractSizing");
+  if (!root) return;
+
+  if (isNaN(cdWsf) || cdWsf < 0) {
+    root.innerHTML = `
+      <div class="dg-head section-heading">
+        <img class="section-icon" src="buildinge_health_tool_asset/contract-demand.png" alt="Contract Demand">
+        <span class="dg-title section-title">Contract Demand (Target: &lt; 5 W/sqft):</span>
+      </div>
+      <div class="rating-fair">Result not available due to missing input(s).</div>
+    `;
+    return;
+  }
+
+  const TARGET = 5;
+  const DOT_COUNT = 13;
+  const AXIS_MAX = DOT_COUNT; // each circle = 1 W/sqft
+
+  const toPct = v => (v / AXIS_MAX) * 100;
+  const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+
+  const scaledValue = clamp(cdWsf, 0, AXIS_MAX);
+  const valuePct = toPct(scaledValue);
+  const targetPct = clamp(toPct(TARGET), 0, 100);
+
+  const firstDotPct = 100 / (DOT_COUNT * 2);
+  const lastDotPct = 100 - firstDotPct;
+  const bubblePct = clamp(valuePct, firstDotPct, lastDotPct);
+
+  const good = cdWsf <= TARGET;
+  const bubbleClass = good ? "dg-good" : "dg-bad";
+  const bubbleMsg = good ? "Right-sized power capacity" : "More power capacity than needed";
+  const lineColor = good ? "#b58cf5" : "#ff4e63";
+
+  const dotsHtml = buildSizingDots(scaledValue, DOT_COUNT, "#9b6be8", "#b58cf5");
+
+  root.innerHTML = `
+    <div class="contract-theme">
+      <div class="dg-head section-heading">
+        <img class="section-icon" src="buildinge_health_tool_asset/contract-demand.png" alt="Contract Demand">
+        <span class="dg-title section-title">Contract Demand (Target: &lt; 5 W/sqft):</span>
+      </div>
+
+      <div class="dg-visual">
+        <div class="dg-bubble ${bubbleClass}" style="left:${bubblePct}%; --dg-line:${lineColor};">
+          <span class="s1">${bubbleMsg}</span>
+          <span class="s2">Your Building ${cdWsf.toFixed(1)} W/sqft</span>
+        </div>
+
+        <div class="dg-scale">
+          <div class="dg-dots">${dotsHtml}</div>
+          <div class="dg-target-marker" style="left:${targetPct}%;"></div>
+        </div>
+
+        <div class="dg-target-label" style="left:${targetPct}%;">
+          ASSURE Target &lt; 5 W/sqft
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+
+
+
 
 
 /*************************************************
@@ -1098,46 +1240,6 @@ function renderResults(r) {
     }
   }
 
-    /* ================= HVAC ================= */
-
-
-
-
-  /* ================= ELECTRICAL ================= */
-  document.getElementById("outDemand").innerHTML = `
-    <div class="electrical-block">
-
-      <div class="electrical-item">
-        <div class="electrical-title">
-          <span class="kpi-icon">⚡</span>
-          <span>Contract Demand (ASSURE KPI: &lt; 5 W/sqft) :</span>
-        </div>
-        <div class="electrical-value ${r.demandSizing.class}">
-          ${
-            r.demandSizing.contract !== "Not provided"
-              ? `${r.demandSizing.contract} — ${r.demandSizing.status}`
-              : `<span class="rating-fair">Result not available due to missing input(s).</span>`
-          }
-        </div>
-      </div>
-
-      <div class="electrical-item">
-        <div class="electrical-title">
-          <span class="kpi-icon">⚡</span>
-          <span>DG Set sizing (ASSURE KPI: &lt; 5 W/sqft) :</span>
-        </div>
-        <div class="electrical-value ${r.demandSizing.class}">
-          ${
-            r.demandSizing.dg !== "Not provided"
-              ? `${r.demandSizing.dg} — ${r.demandSizing.status}`
-              : `<span class="rating-fair">Result not available due to missing input(s).</span>`
-          }
-        </div>
-      </div>
-
-    </div>
-  `;
-
 
   /* ================= WATER (PRO CLEAN VERSION) ================= */
 
@@ -1165,6 +1267,7 @@ function renderResults(r) {
     const step = MAX_LPCD / divisions;
 
     const actualPct = Math.min((r.lpcd / MAX_LPCD) * 100, 100);
+    const actualLabelPct = Math.min(Math.max(actualPct, 8), 88);
     const targetPctRaw = (TARGET / MAX_LPCD) * 100;
 
     // Ensure 45 line always visible
@@ -1191,8 +1294,8 @@ function renderResults(r) {
       scaleHtml += `
         <div class="scale-row ${val === TARGET ? 'scale-target' : ''}"
             style="bottom:${pct}%">
-          <span>${val}</span>
           <div class="scale-line"></div>
+          <span class="scale-num">${val}</span>
           ${val === TARGET ? `<div class="scale-label">(NBC) limit: 45 lpcd</div>` : ``}
         </div>
       `;
@@ -1234,17 +1337,12 @@ function renderResults(r) {
     waterContainer.innerHTML = `
       <div class="water-card">
 
-        <div class="water-title">
-          💧 Water Efficiency (NBC limit: 45 lpcd)
+        <div class="water-title section-heading">
+          <img class="section-icon" src="buildinge_health_tool_asset/water.png" alt="Water Efficiency">
+          <span class="section-title">Water Efficiency (NBC limit: 45 lpcd)</span>
         </div>
 
         <div class="water-wrapper">
-
-          <!-- SCALE -->
-          <div class="water-scale">
-            ${scaleHtml}
-          </div>
-
           <!-- CYLINDER -->
           <div class="water-cylinder">
 
@@ -1255,13 +1353,18 @@ function renderResults(r) {
                 style="bottom:${targetPct}%">
             </div>
 
+            <!-- ACTUAL LABEL INSIDE CYLINDER -->
+            <div class="water-actual-label"
+                style="bottom:${actualLabelPct}%;
+                        color:${r.lpcd > TARGET ? '#FFFFFF' : '#22c55e'}">
+              Actual: ${r.lpcd.toFixed(1)} lpcd
+            </div>
+
           </div>
 
-          <!-- ACTUAL LABEL -->
-          <div class="water-actual-label"
-              style="bottom:${actualPct}%;
-                      color:${r.lpcd > TARGET ? '#ef4444' : '#22c55e'}">
-            Actual: ${r.lpcd.toFixed(1)} lpcd
+          <!-- SCALE (RIGHT SIDE) -->
+          <div class="water-scale">
+            ${scaleHtml}
           </div>
 
         </div>
@@ -1273,8 +1376,9 @@ function renderResults(r) {
     waterContainer.innerHTML = `
       <div class="water-card">
 
-        <div class="water-title">
-          💧 Water Efficiency (NBC limit: 45 lpcd)
+        <div class="water-title section-heading">
+          <img class="section-icon" src="buildinge_health_tool_asset/water.png" alt="Water Efficiency">
+          <span class="section-title">Water Efficiency (NBC limit: 45 lpcd)</span>
         </div>
 
         <div style="padding:20px; color:#fbbf24;">
@@ -1284,11 +1388,6 @@ function renderResults(r) {
       </div>
     `;
   }
-
-
-
-
-
 
   /* ================= EPI BAR ================= */
   updateEpiBar({
@@ -1307,9 +1406,8 @@ function renderResults(r) {
     updateHvacBar(r.sfPerTR);
   }
 
-  if (!isNaN(r.lpcd)) {
-  updateWaterCylinder(r.lpcd);
-}
+  renderContractSizingVisual(r.demandSizing.cdWsf);
+  renderDgSizingVisual(r.demandSizing.dgWsf);
 
 
 
@@ -1321,6 +1419,8 @@ function renderResults(r) {
   void resultsEl.offsetWidth; // force reflow
   resultsEl.classList.add("results-refresh");
 }
+
+
 
 
 

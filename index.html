@@ -12,7 +12,7 @@
 
     <!-- HEADER -->
     <header class="header">
-      <h1>Building Performance Tool</h1>
+      <h1>Building Health Tool</h1>
       <p>Evaluate the Performance of your building</p>
     </header>
 
@@ -139,7 +139,10 @@
       <div class="result-block">
         <div class="bee-rating-block">
           <div class="bee-rating-title">
-            BEE Star Rating :
+            <div class="section-heading">
+              <img class="section-icon" src="buildinge_health_tool_asset/bee-star.png" alt="BEE Star">
+              <span class="section-title">BEE Star Rating :</span>
+            </div>
           </div>
 
           <div id="outStarRating" class="bee-rating-value">
@@ -154,8 +157,9 @@
         <!-- ================= EPI PROGRESS BAR ================= -->
 
       <div class="epi-card">
-        <div class="epi-title-row">
-          <strong>Energy Performance Index (EPI)</strong>
+        <div class="epi-title-row section-heading">
+          <img class="section-icon" src="buildinge_health_tool_asset/net_energy.png" alt="Energy Performance">
+          <strong class="section-title">Energy Performance Index (EPI)</strong>
 
           <span class="epi-info">
             ⓘ
@@ -232,7 +236,10 @@
 </div>
 
       <div class="net-energy-card">
-        <div class="net-energy-title">Net Energy Status</div>
+        <div class="net-energy-title section-heading">
+          <img class="section-icon" src="buildinge_health_tool_asset/net_energy.png" alt="Net Energy">
+          <span class="section-title">Net Energy Status</span>
+        </div>
 
         <div class="net-energy-bar">
 
@@ -262,8 +269,9 @@
 
         <div id="outHvac" class="hvac-card">
 
-          <div class="hvac-title">
-            ❄️ HVAC sizing (ASSURE KPI: 800 sqft/TR)
+          <div class="hvac-title section-heading">
+            <img class="section-icon" src="buildinge_health_tool_asset/hvac-sizing.png" alt="HVAC Sizing">
+            <span class="section-title">HVAC Sizing (ASSURE KPI: 800 sqft/TR)</span>
           </div>
 
           <div class="hvac-bar-wrapper">
@@ -298,7 +306,9 @@
           </div>
 
         </div>
-        <div id="outDemand"></div>
+        <div id="outContractSizing" class="dg-sizing-card"></div>
+        <div id="outDgSizing" class="dg-sizing-card"></div>
+
       </div>
 
 
@@ -306,7 +316,7 @@
       <div class="result-block">
         <!-- <h3>Water</h3> -->
 
-          <div id="outWater" class="water-module">
+          <div id="outWater">
             <div class="water-container">
 
               <div class="water-cylinder-wrapper">
@@ -333,7 +343,5 @@
   <script src="script.js"></script>
 </body>
 </html>
-
-
 
 

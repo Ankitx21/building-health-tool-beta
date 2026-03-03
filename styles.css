@@ -31,7 +31,7 @@ body {
 }
 
 .card {
-  background: #2b3b73;
+  background: #2b3b73;  
   border-radius: 12px;
   padding: 20px;
 }
@@ -890,7 +890,7 @@ button:hover {
 /* ================= LEGEND ================= */
 
 .hvac-legend {
-  margin-top: 3rem;
+  margin-top: 2rem;
   font-size: 13px;
   display: flex;
   flex-direction: column;
@@ -1168,7 +1168,7 @@ button:hover {
 }
 
 /* ================= SMALL PHONES ================= */
-@media (max-width: 0px) {
+@media (max-width: 400px) {
 
   .water-wrapper {
     flex-direction: column;   /* stack vertically */
@@ -1243,9 +1243,6 @@ button:hover {
     min-width: 75px;
   }
 }
-
-
-
 
 .scale-row {
   display: flex;
@@ -1330,7 +1327,7 @@ button:hover {
   left: 180px;
   font-size: 14px;
   font-weight: 800;
-  color: #e92828;
+  color: white;
   /* transform: translateY(50%); */
 }
 
@@ -1428,6 +1425,209 @@ button:hover {
 }
 
 
+/* ================= CONTRACT THEME (uses same DG layout classes) ================= */
+.contract-theme .icon {
+  color: #86d34c;
+}
+
+.contract-theme .dg-dot.filled {
+  background: #9b6be8;
+}
+
+.contract-theme .dg-dot.filled.alt {
+  background: #b58cf5;
+}
+
+.contract-theme .dg-good {
+  background: #25c46b;
+  color: #083f25;
+}
+
+.contract-theme .dg-bad {
+  background: #ff4e63;
+  color: #4d0a16;
+}
+
+
+
+
+/* ================= DG SET SIZING VISUAL (FULL) ================= */
+.dg-sizing-card {
+  margin-top: 14px;
+  background: #223162;
+  border-radius: 12px;
+  padding: 14px 14px 18px;
+}
+
+.dg-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.dg-head .icon {
+  font-size: 18px;
+  color: #7bd451;
+  line-height: 1;
+}
+
+.dg-head .dg-title {
+  font-size: 14px;      /* match Contract Demand text scale */
+  font-weight: 600;
+  line-height: 1.3;
+  color: #e8eefc;
+}
+
+.dg-visual {
+  position: relative;
+  padding-top: 66px;    /* room for bubble */
+  padding-bottom: 48px; /* room for target label */
+}
+
+/* fixed track width so circles look balanced */
+.dg-scale {
+  position: relative;
+  width: min(100%, 520px);
+  margin: 0 auto;
+}
+
+/* dot row */
+.dg-dots {
+  display: grid;
+  grid-template-columns: repeat(13, 1fr);
+  gap: 0;               /* circles touch each other */
+  align-items: center;
+}
+
+.dg-dot {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 50%;
+  background: #cfd2d7;
+  overflow: hidden;
+}
+
+.dg-dot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: calc(var(--fill, 0) * 100%);
+  background: var(--dot-color, #f79a1f);
+}
+
+/* floating bubble */
+.dg-bubble {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  border-radius: 8px;
+  padding: 5px 10px;    /* smaller bubble */
+  text-align: center;
+  white-space: nowrap;
+  z-index: 3;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.dg-bubble .s1 {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.15;
+}
+
+.dg-bubble .s2 {
+  display: block;
+  margin-top: 1px;
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+/* dashed line from bubble to row */
+.dg-bubble::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  height: 38px;
+  border-left: 2px dashed var(--dg-line, #25c46b);
+}
+
+.dg-good {
+  background: #25c46b;
+  color: #083f25;
+}
+
+.dg-bad {
+  background: #ff4e63;
+  color: #4d0a16;
+}
+
+/* ASSURE target marker */
+.dg-target-marker {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;          /* smaller pointer */
+  height: 14px;
+  border-radius: 50%;
+  background: #f2f4f7;
+  border: 1px solid #d7dbe2;
+  z-index: 4;
+}
+
+.dg-target-marker::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  height: 44px;
+  border-left: 2px dashed #f2f4f7;
+}
+
+/* benchmark label */
+.dg-target-label {
+  position: absolute;
+  top: 124px;
+  transform: translateX(-50%);
+  color: #e8eefc;
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* mobile tuning */
+@media (max-width: 768px) {
+  .dg-scale {
+    width: min(100%, 460px);
+  }
+
+  .dg-dots {
+    gap: 0;
+  }
+
+  .dg-head .dg-title {
+    font-size: 14px;
+  }
+
+  .dg-bubble .s1 {
+    font-size: 10px;
+  }
+
+  .dg-bubble .s2 {
+    font-size: 13px;
+  }
+
+  .dg-target-label {
+    font-size: 12px;
+    top: 120px;
+  }
+}
 
 
 
@@ -1435,10 +1635,496 @@ button:hover {
 
 
 
+/* /// water cylinder // */
 
+/* ================= WATER LPCD (CLEAN + RESPONSIVE) ================= */
 
+.water-card {
+  margin-top: 20px;
+}
 
+.water-title {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 14px;
+}
 
+.water-wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 170px 110px; /* cylinder + scale */
+  align-items: end;
+  justify-content: center;
+  column-gap: 18px;
+}
+
+.water-cylinder {
+  position: relative;
+  width: 170px;
+  height: 460px;
+  background: linear-gradient(to right, #bfc1c6 0%, #d7d9de 50%, #bfc1c6 100%);
+  border-radius: 90px / 28px;
+  overflow: hidden;
+  box-shadow:
+    inset -20px 0 36px rgba(0, 0, 0, 0.12),
+    inset 20px 0 36px rgba(255, 255, 255, 0.18);
+}
+
+.water-cylinder::before {
+  content: "";
+  position: absolute;
+  top: -16px;
+  left: 8%;
+  right: 8%;
+  height: 36px;
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.9) 10%, transparent 70%);
+  border-radius: 50%;
+  z-index: 4;
+}
+
+.water-cylinder::after {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  left: 8%;
+  right: 8%;
+  height: 28px;
+  background: #b7bcc4;
+  border-radius: 50%;
+  z-index: 3;
+}
+
+.water-actual {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  z-index: 2;
+}
+
+.water-limit-band {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  height: 6px;
+  background: #e23b52;
+  z-index: 3;
+}
+
+.water-scale {
+  position: relative;
+  width: 110px;
+  min-width: 110px;
+  height: 460px;
+}
+
+.scale-row {
+  position: absolute;
+  left: 0;
+  transform: translateY(50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.scale-line {
+  width: 40px;
+  height: 2px;
+  background: rgba(255, 255, 255, 0.45);
+}
+
+.scale-target span {
+  color: #ffde59;
+  font-weight: 700;
+}
+
+.scale-label {
+  position: absolute;
+  left: 50px;
+  font-size: 12px;
+  color: #ffde59;
+  white-space: nowrap;
+}
+
+.water-actual-label {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  z-index: 5;
+}
+
+/* Tablet / Mobile */
+@media (max-width: 768px) {
+  .water-wrapper {
+    grid-template-columns: 138px 84px;
+    column-gap: 10px;
+  }
+
+  .water-cylinder {
+    width: 138px;
+    height: 380px;
+  }
+
+  .water-scale {
+    width: 84px;
+    min-width: 84px;
+    height: 380px;
+  }
+
+  .scale-row {
+    font-size: 12px;
+    gap: 6px;
+  }
+
+  .scale-line {
+    width: 28px;
+  }
+
+  .scale-label {
+    left: 34px;
+    font-size: 11px;
+    white-space: normal;
+    line-height: 1.1;
+    max-width: 78px;
+  }
+
+  .water-actual-label {
+    font-size: 24px;
+  }
+}
+
+@media (max-width: 420px) {
+  .water-wrapper {
+    grid-template-columns: 124px 74px;
+    column-gap: 8px;
+  }
+
+  .water-cylinder {
+    width: 124px;
+    height: 340px;
+  }
+
+  .water-scale {
+    width: 74px;
+    min-width: 74px;
+    height: 340px;
+  }
+
+  .scale-row {
+    font-size: 11px;
+    gap: 5px;
+  }
+
+  .scale-line {
+    width: 22px;
+  }
+
+  .scale-label {
+    left: 28px;
+    max-width: 68px;
+  }
+
+  .water-actual-label {
+    font-size: 20px;
+  }
+}
+
+/* ===== Water LPCD Final Override (prevents legacy overlap) ===== */
+#outWater .water-card .water-wrapper {
+  position: relative;
+  display: grid;
+  grid-template-columns: 170px 104px;
+  align-items: end;
+  justify-content: center;
+  column-gap: 8px;
+}
+
+#outWater .water-card .water-cylinder {
+  position: relative;
+  width: 170px;
+  height: 390px;
+  overflow: hidden;
+  border-radius: 90px / 28px;
+}
+
+#outWater .water-card .water-scale {
+  position: relative;
+  width: 104px;
+  min-width: 104px;
+  height: 390px;
+  margin: 0;
+}
+
+#outWater .water-card .scale-row {
+  position: absolute;
+  left: 0;
+  right: auto;
+  transform: translateY(50%);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+#outWater .water-card .scale-line {
+  width: 34px;
+}
+
+#outWater .water-card .scale-num {
+  min-width: 44px;
+  font-size: 14px;
+}
+
+#outWater .water-card .scale-label {
+  position: static;
+  left: auto;
+  margin-left: 4px;
+  white-space: nowrap;
+}
+
+#outWater .water-card .water-actual-label {
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 88%;
+  text-align: center;
+  font-size: clamp(12px, 2vw, 18px);
+  line-height: 1.1;
+  z-index: 6;
+  font-weight: 500;
+}
+
+@media (max-width: 768px) {
+  #outWater .water-card .water-wrapper {
+    grid-template-columns: 138px 78px;
+    column-gap: 7px;
+  }
+
+  #outWater .water-card .water-cylinder {
+    width: 138px;
+    height: 380px;
+  }
+
+  #outWater .water-card .water-scale {
+    width: 78px;
+    min-width: 78px;
+    height: 380px;
+  }
+
+  #outWater .water-card .scale-row {
+    font-size: 12px;
+    gap: 5px;
+  }
+
+  #outWater .water-card .scale-line {
+    width: 22px;
+  }
+
+  #outWater .water-card .scale-num {
+    min-width: 36px;
+    font-size: 12px;
+  }
+
+  #outWater .water-card .scale-label {
+    left: auto;
+    font-size: 11px;
+    white-space: normal;
+    line-height: 1.1;
+    max-width: 70px;
+    margin-left: 4px;
+  }
+}
+
+@media (max-width: 420px) {
+  #outWater .water-card .water-wrapper {
+    grid-template-columns: 124px 72px;
+    column-gap: 6px;
+  }
+
+  #outWater .water-card .water-cylinder {
+    width: 124px;
+    height: 340px;
+  }
+
+  #outWater .water-card .water-scale {
+    width: 72px;
+    min-width: 72px;
+    height: 340px;
+  }
+
+  #outWater .water-card .scale-row {
+    font-size: 11px;
+    gap: 5px;
+  }
+
+  #outWater .water-card .scale-line {
+    width: 18px;
+  }
+
+  #outWater .water-card .scale-num {
+    min-width: 32px;
+    font-size: 11px;
+  }
+
+  #outWater .water-card .scale-label {
+    left: auto;
+    max-width: 62px;
+    margin-left: 3px;
+  }
+}
+
+/* ===== Unified Output Headings ===== */
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-icon {
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  flex: 0 0 20px;
+}
+
+.section-title {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.25;
+  color: #e8eefc;
+}
+
+.bee-rating-title,
+.net-energy-title,
+.hvac-title,
+.water-title,
+.dg-head {
+  margin: 0 0 10px;
+}
+
+.epi-title-row.section-heading {
+  margin-bottom: 18px;
+}
+
+.epi-title-row.section-heading .epi-info {
+  margin-left: auto;
+}
+
+.dg-head .section-title {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .section-title {
+    font-size: 14px;
+  }
+
+  .section-icon {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+}
+
+/* ===== Output Vertical Rhythm ===== */
+#results .result-block {
+  margin-bottom: 16px;
+  padding: 14px;
+}
+
+#results .result-block:last-child {
+  margin-bottom: 0;
+}
+
+#results .epi-card,
+#results .net-energy-card,
+#results .hvac-card,
+#results .dg-sizing-card,
+#results .water-card {
+  margin-top: 16px;
+}
+
+#results .bee-rating-block {
+  margin-bottom: 14px;
+}
+
+#results .section-heading {
+  margin-bottom: 12px;
+}
+
+#results .section-title {
+  letter-spacing: 0.1px;
+}
+
+#results .epi-title-row.section-heading {
+  margin-bottom: 16px;
+}
+
+#results .net-energy-message,
+#results .epi-message {
+  margin-top: 12px;
+}
+
+#results #outContractSizing {
+  margin-top: 16px;
+}
+
+#results #outDgSizing {
+  margin-top: 16px;
+}
+
+@media (max-width: 768px) {
+  #results .result-block {
+    padding: 12px;
+    margin-bottom: 14px;
+  }
+
+  #results .epi-card,
+  #results .net-energy-card,
+  #results .hvac-card,
+  #results .dg-sizing-card,
+  #results .water-card {
+    margin-top: 14px;
+  }
+
+  #results .section-heading {
+    margin-bottom: 10px;
+  }
+}
+
+/* ===== Icon Left-Edge Alignment ===== */
+/* Baseline heading start is result-block content edge.
+   EPI and DG/Contract cards have extra inner padding, so compensate only for headings. */
+#results .epi-card > .section-heading {
+  margin-left: -24px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+#results .dg-sizing-card .section-heading {
+  margin-left: -14px;
+  padding-left: 14px;
+  padding-right: 14px;
+}
+
+@media (max-width: 768px) {
+  #results .epi-card > .section-heading {
+    margin-left: -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+  }
+
+  #results .dg-sizing-card .section-heading {
+    margin-left: -14px;
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+}
 
 
 
