@@ -1419,8 +1419,3 @@ function renderResults(r) {
   void resultsEl.offsetWidth; // force reflow
   resultsEl.classList.add("results-refresh");
 }
-
-
-
-
-
