@@ -13,21 +13,16 @@
     <!-- HEADER -->
     <header class="header">
       <h1>Building Health Tool</h1>
-      <p>For best results, we recommend completing all fields in the form. Please note that the project data you share is used solely to generate your assessment, and not stored or disseminated for any other purposes.</p>
+      <p>Evaluate the Performance of your building</p>
     </header>
 
     <!-- MAIN GRID -->
-    <main class="main-grid" id="mainGrid">
+    <main class="main-grid">
 
       <!-- LEFT : INPUTS -->
-      <section class="card input-card" id="inputCard">
+      <section class="card">
 
-        <label class="field-label">Building Type
-          <span class="input-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">At present, this tool is available only for offices.</span>
-          </span>
-        </label>
+        <label>Building Type</label>
         <select id="buildingType">
           <option>Office</option>
         </select>
@@ -36,14 +31,14 @@
 
         <div class="inline">
           <div class="field">
-            <label for="state" class="field-label">State</label>
+            <label for="state">State</label>
             <select id="state">
               <option value="">Select State</option>
             </select>
           </div>
 
           <div class="field">
-            <label for="city" class="field-label">City</label>
+            <label for="city">City</label>
             <select id="city" disabled>
               <option value="">Select City</option>
             </select>
@@ -56,35 +51,22 @@
         <div class="form-row two-col">
           <div class="form-group">
             <label class="field-label">
-              Built-up Area (m²)
-              <span class="input-help">
-                <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-                <span class="input-help-tooltip">Total area of the building, excluding covered parking.</span>
-              </span>
+              Built-up Area (m²) - 
+              <span class="label-note">(Excluding parking)</span>
             </label>
-            <input type="number" id="area" placeholder="e.g. 10,000">
+            <input type="number" id="area" placeholder="e.g. 6000">
           </div>
 
           <div class="form-group">
-            <label class="field-label">Percentage of Air Conditioned Area (%)
-              <span class="input-help">
-                <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-                <span class="input-help-tooltip">Percentage of the built-up area that is air-conditioned.</span>
-              </span>
-            </label>
+            <label>Air-conditioned Area (%)</label>
             <input type="number" id="acArea" placeholder="e.g. 80">
           </div>
         </div>
 
         <!-- TOTAL OCCUPANTS (FULL WIDTH) -->
         <div class="form-group">
-          <label class="field-label">Total Number of Occupants
-            <span class="input-help">
-              <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-              <span class="input-help-tooltip">Total number of people occupying the building on a typical day.</span>
-            </span>
-          </label>
-          <input type="number" id="occupants" placeholder="e.g. 1000">
+          <label>Total Number of Occupants</label>
+          <input type="number" id="occupants" placeholder="e.g. 350">
         </div>
 
 
@@ -92,122 +74,74 @@
         <!-- ENERGY -->
         <!-- <h2>Energy Performance</h2> -->
 
-        <label class="field-label">Electricity Consumption
-          <span class="input-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">Total electricity used by the building. You can find this on your electricity bills.</span>
-          </span>
-        </label>
+        <label>Electricity Consumption</label>
         <div class="inline">
-          <input type="number" id="energy" placeholder="e.g. 2,50,000">
+          <input type="number" id="energy" placeholder="e.g. 250000">
           <select id="energyPeriod">
             <option value="monthly">Monthly Average (kWh)</option>
             <option value="annual">Annual (kWh)</option>           
           </select>
         </div>
 
-        <label class="field-label">Installed AC Capacity (TR)
-          <span class="input-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">Total installed cooling capacity of all air-conditioning systems.</span>
-          </span>
-        </label>
-        <input type="number" id="acCapacity" placeholder="e.g. 250">
+        <label>Installed AC Capacity (TR)</label>
+        <input type="number" id="acCapacity" placeholder="e.g. 300">
 
         <!-- CONTRACT DEMAND + DG SET (SIDE BY SIDE) -->
         <div class="form-row two-col">
           <div class="form-group">
-            <label class="field-label">Contract Demand (kVA)
-              <span class="input-help">
-                <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-                <span class="input-help-tooltip">Maximum electrical load agreed with the utility, usually listed on the electricity bill.</span>
-              </span>
-            </label>
+            <label>Contract Demand (kVA)</label>
             <input
               type="number"
               id="contractDemand"
-              placeholder="e.g. 115"
+              placeholder="e.g. 450"
             >
           </div>
 
           <div class="form-group">
-            <label class="field-label">DG Set Size (kVA)
-              <span class="input-help">
-                <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-                <span class="input-help-tooltip">Total backup generator capacity installed in the building.</span>
-              </span>
-            </label>
+            <label>DG Set Size (kVA)</label>
             <input
               type="number"
               id="dgSize"
-              placeholder="e.g. 10"
+              placeholder="e.g. 500"
             >
           </div>
         </div>
 
 
-        <label id="renewableLabel" class="field-label">
-          Renewable Energy Generation
-          <span class="input-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">Total energy generated from renewable sources such as solar panels, entered as either a monthly average or annual total.</span>
-          </span>
+        <label id="renewableLabel">
+          Renewable Energy Generation (Annual kWh)
         </label>
 
-        <div class="inline">
-          <input
-            type="number"
-            id="renewableValue"
-            placeholder="e.g. 0"
-          />
-          <select id="renewablePeriod">
-            <option value="monthly">Monthly Average (kWh)</option>
-            <option value="annual" selected>Annual (kWh)</option>
-          </select>
-        </div>
+        <input
+          type="number"
+          id="renewableValue"
+          placeholder="e.g. 250000"
+        />
 
-        <label class="field-label">
-          Water Consumption 
-          <span class="input-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">Total water used by the building from all sources, entered as a monthly average, annual total, or average working day total.</span>
-          </span>
+        <label>
+          Water Consumption (Annual kilolitres)
         </label>
 
-        <div class="inline">
-          <input
-            type="number"
-            id="water"
-            placeholder="e.g. 10,000"
-          />
-          <select id="waterPeriod">
-            <option value="monthly">Monthly Average (kilolitres)</option>
-            <option value="annual" selected>Annual (kilolitres)</option>
-            <option value="daily">Daily (kilolitres)</option>
-          </select>
-        </div>
+        <input
+          type="number"
+          id="water"
+          placeholder="e.g. 12000"
+        />
 
-        <div class="action-stack">
-          <button id="assessBtn">Assess My Building</button>
-          <button id="resetBtn" type="button" class="button-secondary">Assess Another Project</button>
-        </div>
+        <button id="assessBtn">Assess My Building</button>
       </section>
 
       <!-- RIGHT : RESULTS -->
-<section class="card results-panel hidden" id="results">
+<section class="card hidden" id="results">
 
 
       <!-- ================= SUMMARY ================= -->
-      <div class="result-block results-content">
+      <div class="result-block">
         <div class="bee-rating-block">
           <div class="bee-rating-title">
             <div class="section-heading">
               <img class="section-icon" src="buildinge_health_tool_asset/bee-star.png" alt="BEE Star">
               <span class="section-title">BEE Star Rating :</span>
-              <span class="input-help output-help">
-                <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-                <span class="input-help-tooltip">BEE (Bureau of Energy Efficiency) label that rates a building's energy efficiency from 1 to 5 stars with higher stars indicating better performance.</span>
-              </span>
             </div>
           </div>
 
@@ -227,11 +161,10 @@
           <img class="section-icon" src="buildinge_health_tool_asset/net_energy.png" alt="Energy Performance">
           <strong class="section-title">Energy Performance Index (EPI)</strong>
 
-          <span class="input-help output-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
+          <span class="epi-info">
             ⓘ
-            <span class="input-help-tooltip">
-              The annual energy a building uses per square meter (kWh/m²/year), indicating its overall energy efficiency. Lower values mean better performance.
+            <span class="epi-tooltip">
+              Lower EPI means higher energy efficiency
             </span>
           </span>
         </div>
@@ -241,12 +174,12 @@
 
           <!-- LABELS ON TOP -->
           <div class="epi-label assure-label" id="assureLabel">
-            ASSURE KPI<br>
+            ASSURE Target<br>
             <b> 75 kWh/m²/yr</b>
           </div>
 
           <div class="epi-label building-label" id="buildingLabel">
-            Your Building's EPI<br>
+            Your Building EPI<br>
             <b><span id="buildingEpiText">—</span> kWh/m²/yr</b>
           </div>
 
@@ -306,10 +239,6 @@
         <div class="net-energy-title section-heading">
           <img class="section-icon" src="buildinge_health_tool_asset/net_energy.png" alt="Net Energy">
           <span class="section-title">Net Energy Status</span>
-          <span class="input-help output-help">
-            <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-            <span class="input-help-tooltip">Net Energy Status shows whether your building produces enough energy to meet its needs. A positive status means you produce more than you consume.</span>
-          </span>
         </div>
 
         <div class="net-energy-bar">
@@ -318,7 +247,7 @@
           <div class="net-energy-row consumed">
             <div class="net-bar-fill net-energy-consumed"></div>
             <div class="net-bar-text" id="conText">
-              Consumed – 0 kwh
+              Consumed – 0 kWh
             </div>
           </div>
 
@@ -336,31 +265,26 @@
       </div>
 
       <!-- ================= HVAC & ELECTRICAL ================= -->
-      <div class="results-subsection">
+      <div class="result-block">
 
         <div id="outHvac" class="hvac-card">
 
           <div class="hvac-title section-heading">
             <img class="section-icon" src="buildinge_health_tool_asset/hvac-sizing.png" alt="HVAC Sizing">
-            <span class="section-title">HVAC Sizing </span>
-            <span class="input-help output-help">
-              <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
-              <span class="input-help-tooltip">HVAC Capacity Factor (sqft/TR) indicates the floor area cooled by a single ton of air conditioning. A higher value suggests a more efficient building that needs smaller cooling equipment.</span>
-            </span>
+            <span class="section-title">HVAC Sizing (ASSURE KPI: 800 sqft/TR)</span>
           </div>
 
           <div class="hvac-bar-wrapper">
 
             <div class="hvac-building-label" id="hvacBuildingLabel">
-              Your Building's<br>
+              Your Building<br>
               <b id="hvacBuildingValue">—</b>
             </div>
-
-            <div class="hvac-marker building"></div>
 
             <div class="hvac-bar">
               <div class="hvac-fill"></div>
 
+              <div class="hvac-marker building"></div>
 
               <div class="hvac-marker target">
                 <div class="target-dot"></div>
@@ -389,7 +313,7 @@
 
 
       <!-- ================= WATER ================= -->
-      <div class="results-subsection">
+      <div class="result-block">
         <!-- <h3>Water</h3> -->
 
           <div id="outWater">
@@ -408,10 +332,6 @@
             </div>
           </div>
 
-      </div>
-
-      <div class="results-actions">
-        <button id="downloadReportBtn" type="button" class="button-secondary">Download Report</button>
       </div>
 
     </section>
