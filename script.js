@@ -1,3 +1,227 @@
+const mainGrid = document.getElementById("mainGrid");
+const resultsSection = document.getElementById("results");
+const assessBtn = document.getElementById("assessBtn");
+const resetBtn = document.getElementById("resetBtn");
+const downloadReportBtn = document.getElementById("downloadReportBtn");
+
+let latestResults = null;
+
+function collectInputs() {
+  return {
+    buildingType: readText("buildingType"),
+    state: readText("state"),
+    city: readText("city"),
+    areaSqm: readNumber("area"),
+    energyKWh: readNumber("energy"),
+    energyPeriod: readText("energyPeriod"),
+    coolingTR: readNumber("acCapacity"),
+    contractDemandKVA: readNumber("contractDemand"),
+    dgSize: readNumber("dgSize"),
+    renewableValue: readNumber("renewableValue"),
+    renewablePeriod: readText("renewablePeriod"),
+    acAreaPercentage: readNumber("acArea"),
+    waterKL: readNumber("water"),
+    waterPeriod: readText("waterPeriod"),
+    occupants: readNumber("occupants")
+  };
+}
+
+function setResultsVisibility(showResults) {
+  if (!mainGrid || !resultsSection) return;
+
+  mainGrid.classList.toggle("has-results", showResults);
+  resultsSection.classList.toggle("hidden", !showResults);
+}
+
+function resetAssessmentForm() {
+  const resetFields = [
+    "area",
+    "acArea",
+    "occupants",
+    "energy",
+    "acCapacity",
+    "contractDemand",
+    "dgSize",
+    "renewableValue",
+    "water"
+  ];
+
+  resetFields.forEach(id => {
+    const field = document.getElementById(id);
+    if (field) field.value = "";
+  });
+
+  const buildingType = document.getElementById("buildingType");
+  const state = document.getElementById("state");
+  const city = document.getElementById("city");
+  const energyPeriod = document.getElementById("energyPeriod");
+  const renewablePeriod = document.getElementById("renewablePeriod");
+  const waterPeriod = document.getElementById("waterPeriod");
+
+  if (buildingType) buildingType.selectedIndex = 0;
+  if (state) state.value = "";
+  if (energyPeriod) energyPeriod.value = "monthly";
+  if (renewablePeriod) renewablePeriod.value = "annual";
+  if (waterPeriod) waterPeriod.value = "annual";
+
+  if (city) {
+    city.innerHTML = `<option value="">Select City</option>`;
+    city.disabled = true;
+  }
+}
+
+function getElementText(id) {
+  const el = document.getElementById(id);
+  return el ? el.textContent.trim().replace(/\s+/g, " ") : "";
+}
+
+function formatMetricValue(value, digits = 1) {
+  return Number.isFinite(value) ? value.toFixed(digits) : MISSING_RESULT_TEXT;
+}
+
+function clampFloatingElement(element, container, pct, padding = 8) {
+  if (!element || !container || !Number.isFinite(pct)) return;
+
+  const containerWidth = container.clientWidth;
+  const elementWidth = element.offsetWidth;
+  const containerLeft = container.offsetLeft;
+
+  if (!containerWidth || !elementWidth) return;
+
+  const desiredCenter = (pct / 100) * containerWidth;
+  const minCenter = (elementWidth / 2) + padding;
+  const maxCenter = containerWidth - (elementWidth / 2) - padding;
+  const clampedCenter = Math.min(Math.max(desiredCenter, minCenter), maxCenter);
+
+  element.style.left = `${containerLeft + clampedCenter}px`;
+}
+
+function positionBubbleWithStem(bubble, container, pct, padding = 8, edgeBias = 0) {
+  if (!bubble || !container || !Number.isFinite(pct)) return;
+
+  const containerWidth = container.clientWidth;
+  const bubbleWidth = bubble.offsetWidth;
+  const containerLeft = container.offsetLeft;
+
+  if (!containerWidth || !bubbleWidth) return;
+
+  const desiredCenter = (pct / 100) * containerWidth;
+  const maxCenter = containerWidth - (bubbleWidth / 2) - padding - edgeBias;
+  const clampedCenter = Math.min(Math.max(desiredCenter, 0), maxCenter);
+  const stemOffset = Math.min(
+    Math.max(desiredCenter - (clampedCenter - (bubbleWidth / 2)), 4),
+    bubbleWidth - 4
+  );
+
+  bubble.style.left = `${containerLeft + clampedCenter}px`;
+  bubble.style.setProperty("--bubble-stem-left", `${stemOffset}px`);
+}
+
+function positionBubbleInFrame(bubble, frame, scale, pct, padding = 8) {
+  if (!bubble || !frame || !scale || !Number.isFinite(pct)) return;
+
+  const frameWidth = frame.clientWidth;
+  const scaleWidth = scale.clientWidth;
+  const scaleLeft = scale.offsetLeft;
+  const bubbleWidth = bubble.offsetWidth;
+
+  if (!frameWidth || !scaleWidth || !bubbleWidth) return;
+
+  const desiredCenter = scaleLeft + ((pct / 100) * scaleWidth);
+  const minCenter = (bubbleWidth / 2) + padding;
+  const maxCenter = frameWidth - (bubbleWidth / 2) - padding;
+  const clampedCenter = Math.min(Math.max(desiredCenter, minCenter), maxCenter);
+  const stemOffset = Math.min(
+    Math.max(desiredCenter - (clampedCenter - (bubbleWidth / 2)), 4),
+    bubbleWidth - 4
+  );
+
+  bubble.style.left = `${clampedCenter}px`;
+  bubble.style.setProperty("--bubble-stem-left", `${stemOffset}px`);
+
+  return {
+    desiredCenter,
+    clampedCenter,
+    stemOffset,
+    stemAbsoluteLeft: clampedCenter - (bubbleWidth / 2) + stemOffset
+  };
+}
+
+function downloadReport() {
+  if (!latestResults) return;
+
+  const inputs = collectInputs();
+  const reportDate = new Date().toLocaleString("en-IN", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  });
+  const citySlug = (inputs.city || "project")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-|-$/g, "") || "project";
+
+  const reportHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Building Health Report</title>
+  <style>
+    body { margin: 0; padding: 32px; background: #142347; color: #e8eefc; font-family: "Segoe UI", sans-serif; }
+    .report { max-width: 920px; margin: 0 auto; }
+    .hero, .panel { background: #223162; border: 1px solid rgba(232, 238, 252, 0.12); border-radius: 18px; padding: 24px; box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18); }
+    .hero { margin-bottom: 18px; }
+    h1, h2 { margin: 0 0 12px; }
+    p { margin: 0; line-height: 1.6; color: #dbe4ff; }
+    .meta, .grid { display: grid; gap: 14px; }
+    .meta { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); margin-top: 18px; }
+    .grid { grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); }
+    .item { background: #1b2850; border-radius: 14px; padding: 16px; }
+    .label { display: block; margin-bottom: 8px; font-size: 13px; letter-spacing: 0.04em; text-transform: uppercase; color: #9fb3ea; }
+    .value { font-size: 20px; font-weight: 700; color: #ffffff; }
+    .note { margin-top: 8px; font-size: 14px; color: #dbe4ff; }
+  </style>
+</head>
+<body>
+  <div class="report">
+    <div class="hero">
+      <h1>Building Health Report</h1>
+      <p>Generated on ${reportDate}</p>
+      <div class="meta">
+        <div class="item"><span class="label">Building Type</span><div class="value">${inputs.buildingType || "Office"}</div></div>
+        <div class="item"><span class="label">Location</span><div class="value">${inputs.city || "Not provided"}</div><div class="note">${inputs.state || ""}</div></div>
+        <div class="item"><span class="label">Climate Zone</span><div class="value">${latestResults.climateZone || "Unknown"}</div></div>
+      </div>
+    </div>
+    <div class="panel">
+      <h2>Assessment Summary</h2>
+      <div class="grid">
+        <div class="item"><span class="label">BEE Star Rating</span><div class="value">${getElementText("outStarRating") || MISSING_RESULT_TEXT}</div></div>
+        <div class="item"><span class="label">Energy Performance Index</span><div class="value">${formatMetricValue(latestResults.epi)} kWh/m²/yr</div><div class="note">${getElementText("epiMessage")}</div></div>
+        <div class="item"><span class="label">Net Energy Status</span><div class="value">${latestResults.netEnergy > 0 ? "Net Positive" : latestResults.netEnergy < 0 ? "Net Negative" : "Net Zero"}</div><div class="note">${getElementText("netEnergyMsg")}</div></div>
+        <div class="item"><span class="label">HVAC Sizing</span><div class="value">${latestResults.hvacSizing.value || MISSING_RESULT_TEXT}</div><div class="note">${latestResults.hvacSizing.status || ""}</div></div>
+        <div class="item"><span class="label">Contract Demand</span><div class="value">${latestResults.demandSizing.contract || "Not provided"}</div><div class="note">${latestResults.demandSizing.contractStatus || ""}</div></div>
+        <div class="item"><span class="label">DG Set Sizing</span><div class="value">${latestResults.demandSizing.dg || "Not provided"}</div><div class="note">${latestResults.demandSizing.dgStatus || ""}</div></div>
+        <div class="item"><span class="label">Water Efficiency</span><div class="value">${Number.isFinite(latestResults.lpcd) ? `${latestResults.lpcd.toFixed(1)} lpcd` : MISSING_RESULT_TEXT}</div><div class="note">${latestResults.waterStatus.text || ""}</div></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>`;
+
+  const blob = new Blob([reportHtml], { type: "text/html" });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+
+  link.href = url;
+  link.download = `building-health-report-${citySlug}.html`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
 /*************************************************
  * CONSTANTS
  *************************************************/
@@ -152,6 +376,28 @@ function readText(id) {
   return el ? el.value.trim() : "";
 }
 
+function toAnnualEnergyKWh(value, period) {
+  if (!Number.isFinite(value) || value <= 0) return 0;
+  return period === "monthly" ? value * 12 : value;
+}
+
+function toAnnualWaterKL(value, period) {
+  if (!Number.isFinite(value) || value <= 0) return NaN;
+
+  if (period === "monthly") return value * 12;
+  if (period === "daily") return value * 220;
+  return value;
+}
+
+function buildOutputHelp(text) {
+  return `
+    <span class="input-help output-help">
+      <img class="input-help-icon" src="buildinge_health_tool_asset/i_icon.png" alt="More info">
+      <span class="input-help-tooltip">${text}</span>
+    </span>
+  `;
+}
+
 /*************************************************
  * STATE → CITY DROPDOWN (FIXED)'
  *************************************************/
@@ -242,8 +488,10 @@ function calculateBuildingPerformance(inputs) {
     contractDemandKVA,
     dgSize,
     renewableValue,
+    renewablePeriod,
     acAreaPercentage,
     waterKL,      // ✅ ADD
+    waterPeriod,
     occupants,
     // lpcd
   } = inputs;
@@ -252,8 +500,7 @@ function calculateBuildingPerformance(inputs) {
 
 
   /* ---------- ENERGY ---------- */
-  const energyAnnualKWh =
-    energyPeriod === "monthly" ? energyKWh * 12 : energyKWh;
+  const energyAnnualKWh = toAnnualEnergyKWh(energyKWh, energyPeriod);
 
   /* ---------- AREA ---------- */
   const areaSqft = areaSqm / 0.092903;
@@ -281,11 +528,8 @@ function calculateBuildingPerformance(inputs) {
   const annualEnergyDemand = energyAnnualKWh;
 
 
-  // Renewable generation (already annual kWh)
-  const renewableGenKWh =
-    !isNaN(renewableValue) && renewableValue > 0
-      ? renewableValue
-      : 0;
+  // Renewable generation normalized to annual kWh
+  const renewableGenKWh = toAnnualEnergyKWh(renewableValue, renewablePeriod);
 
   // Net balance
   const netEnergy = renewableGenKWh - annualEnergyDemand;
@@ -477,15 +721,16 @@ if (areaSqft > 0) {
 
 /* ================= LPCD CALCULATION ================= */
 let lpcd = NaN;
+const annualWaterKL = toAnnualWaterKL(waterKL, waterPeriod);
 
 if (
-  !isNaN(waterKL) &&
-  waterKL > 0 &&
+  !isNaN(annualWaterKL) &&
+  annualWaterKL > 0 &&
   !isNaN(occupants) &&
   occupants > 0
 ) {
   // Annual kL → litres
-  const annualLitres = waterKL * 1000;
+  const annualLitres = annualWaterKL * 1000;
 
   // LPCD calcurflation (220 working days)
   lpcd = annualLitres / (occupants * 220);
@@ -493,6 +738,8 @@ if (
 
 console.log("WATER DEBUG:", {
   waterKL,
+  waterPeriod,
+  annualWaterKL,
   occupants,
   lpcd
 });
@@ -568,6 +815,7 @@ function updateEpiBar({ epi, thresholds, assure, coldClimate = false }) {
   const fill = document.querySelector(".epi-fill");
   const buildingMarker = document.querySelector(".building-marker");
   const assureMarker = document.querySelector(".assure-marker");
+  const bar = document.querySelector(".epi-bar");
 
   const buildingLabel = document.getElementById("buildingLabel");
   const assureLabel = document.getElementById("assureLabel");
@@ -605,7 +853,7 @@ function updateEpiBar({ epi, thresholds, assure, coldClimate = false }) {
 
     msg.innerHTML = `
       <b>EPI benchmarking not available.</b><br>
-      Comparison with ASSURE target (75 kWh/m²/yr) cannot be provided
+      Comparison with ASSURE KPI (75 kWh/m²/yr) cannot be provided
       due to missing BEE star benchmark equations for cold climate zones.
     `;
 
@@ -691,6 +939,8 @@ function updateEpiBar({ epi, thresholds, assure, coldClimate = false }) {
   assureLabel.style.left = `${assurePct}%`;
 
   buildingText.textContent = Math.round(epi);
+  clampFloatingElement(buildingLabel, bar, buildingPct);
+  clampFloatingElement(assureLabel, bar, assurePct);
 
   /* ===============================
      5️⃣ STAR POSITIONING
@@ -740,7 +990,7 @@ function updateEpiBar({ epi, thresholds, assure, coldClimate = false }) {
   else {
     const delta = Math.round(epi - assure);
     msg.innerHTML =
-      `<b>Very high energy use.</b> ${delta} kWh/m²/yr above ASSURE target (75 kWh/m²/yr)`;
+      `<b>Very high energy use.</b> ${delta} kWh/m²/yr above ASSURE KPI (75 kWh/m²/yr)`;
   }
 }
 
@@ -814,6 +1064,7 @@ function updateHvacBar(sfPerTR) {
 
   const buildingLabel = document.getElementById("hvacBuildingLabel");
   const buildingValue = document.getElementById("hvacBuildingValue");
+  const bar = document.querySelector(".hvac-bar");
 
   /* ================= DYNAMIC SCALE ================= */
   const AXIS_MAX = Math.max(sfPerTR, TARGET) * 1.2;
@@ -826,17 +1077,17 @@ function updateHvacBar(sfPerTR) {
   fill.style.width = `${buildingPct}%`;
 
   /* ================= POSITIONING ================= */
-  buildingMarker.style.left = `${buildingPct}%`;
   targetMarker.style.left = `${targetPct}%`;
   targetLabel = document.getElementById("hvacTargetLabel");
   targetLabel.style.left = `${targetPct}%`;
 
 
-  buildingLabel.style.left = `${buildingPct}%`;
   buildingValue.textContent = `${Math.round(sfPerTR)} sqft/TR`;
+  buildingLabel.style.left = `${buildingPct}%`;
+  buildingLabel.style.setProperty("--bubble-stem-left", "50%");
 
   if (targetLabel) {
-    targetLabel.textContent = `800 sqft/TR`;
+    targetLabel.textContent = `ASSURE KPI 800 sqft/TR`;
   }
 
   /* ================= STRICT COLOR LOGIC ================= */
@@ -863,12 +1114,11 @@ function updateHvacBar(sfPerTR) {
   // Change floating label box
   buildingLabel.style.background = color;
   buildingLabel.style.borderColor = color;
+  buildingLabel.style.setProperty("--marker-color", color);
 
   // Change text color
   buildingValue.style.color = "#ffffff";
 }
-
-// ############################ WATER CYLINDER ##################################
 
 // ############################ WATER CYLINDER ##################################
 
@@ -981,7 +1231,7 @@ function updateWaterCylinder(lpcd) {
 /*************************************************
  * ASSESS BUTTON (FINAL – VALIDATED)
  *************************************************/
-document.getElementById("assessBtn").addEventListener("click", () => {
+assessBtn.addEventListener("click", () => {
 
   /* ========= COLLECT INPUTS ========= */
   const inputs = {
@@ -992,14 +1242,15 @@ document.getElementById("assessBtn").addEventListener("click", () => {
     coolingTR: readNumber("acCapacity"),
     contractDemandKVA: readNumber("contractDemand"),
     dgSize: readNumber("dgSize"),
-    renewableValue: readNumber("renewableValue"), 
+    renewableValue: readNumber("renewableValue"),
+    renewablePeriod: readText("renewablePeriod"),
     acAreaPercentage: readNumber("acArea"),
     waterKL: readNumber("water"),        // ✅ ADD
+    waterPeriod: readText("waterPeriod"),
     occupants: readNumber("occupants"),  // ✅ ADD
     // lpcd: readNumber("lpcd")
   };
 
-  /* ========= BASIC REQUIRED CHECK ========= */
 /* ========= CITY REQUIRED (ONLY POPUP CASE) ========= */
 if (!inputs.city) {
   alert("Please select State and City to continue");
@@ -1011,6 +1262,9 @@ if (!inputs.city) {
   const results = calculateBuildingPerformance(inputs);
   renderResults(results);
 });
+
+resetBtn.addEventListener("click", resetAssessmentForm);
+downloadReportBtn.addEventListener("click", downloadReport);
 
 function buildDemandLine(d) {
   const parts = [];
@@ -1049,6 +1303,11 @@ function buildSizingDots(value, dotCount, colorA, colorB) {
   return dotsHtml;
 }
 
+function getSizingScalePct(value, dotCount) {
+  const clampedValue = Math.max(0, Math.min(value, dotCount));
+  return (clampedValue / dotCount) * 100;
+}
+
 function renderDgSizingVisual(dgWsf) {
   const root = document.getElementById("outDgSizing");
   if (!root) return;
@@ -1057,7 +1316,8 @@ function renderDgSizingVisual(dgWsf) {
     root.innerHTML = `
       <div class="dg-head section-heading">
         <img class="section-icon" src="buildinge_health_tool_asset/dg-set-sizing.png" alt="DG Set Sizing">
-        <span class="dg-title section-title">DG set sizing (Target: &lt; 5 W/sqft):</span>
+        <span class="dg-title section-title">DG set sizing </span>
+        ${buildOutputHelp("Backup Power Density is the electrical power consumption per floor area that can be supported by the DG system. Lower value indicates a lean backup system that prioritises only the essentials while a higher value indicates redundancy.")}
       </div>
       <div class="rating-fair">Result not available due to missing input(s).</div>
     `;
@@ -1069,17 +1329,13 @@ function renderDgSizingVisual(dgWsf) {
 
   const AXIS_MAX = DOT_COUNT; // each circle = 1 W/sqft
 
-  const toPct = v => (v / AXIS_MAX) * 100;
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
   const scaledValue = clamp(dgWsf, 0, AXIS_MAX);
-  const valuePct = toPct(scaledValue);
-  const targetPct = clamp(toPct(TARGET), 0, 100);
+  const valuePct = getSizingScalePct(scaledValue, DOT_COUNT);
+  const targetPct = getSizingScalePct(TARGET, DOT_COUNT);
 
-  // Anchor to dot centers so 0.0 sits on first circle (not second)
-  const firstDotPct = 100 / (DOT_COUNT * 2);   // center of first dot
-  const lastDotPct = 100 - firstDotPct;        // center of last dot
-  const bubblePct = clamp(valuePct, firstDotPct, lastDotPct);
+  const bubblePct = clamp(valuePct, 0, 100);
   const good = dgWsf <= TARGET;
   const bubbleClass = good ? "dg-good" : "dg-bad";
   const bubbleMsg = good ? "Right amount of backup power" : "More backup power than needed";
@@ -1090,7 +1346,8 @@ function renderDgSizingVisual(dgWsf) {
   root.innerHTML = `
     <div class="dg-head section-heading">
         <img class="section-icon" src="buildinge_health_tool_asset/dg-set-sizing.png" alt="DG Set Sizing">
-        <span class="dg-title section-title">DG set sizing (Target: &lt; 5 W/sqft):</span>
+        <span class="dg-title section-title">DG set sizing </span>
+        ${buildOutputHelp("Backup Power Density is the electrical power consumption per floor area that can be supported by the DG system. Lower value indicates a lean backup system that prioritises only the essentials while a higher value indicates redundancy.")}
       </div>
 
     <div class="dg-visual">
@@ -1109,6 +1366,13 @@ function renderDgSizingVisual(dgWsf) {
       </div>
     </div>
   `;
+
+  const bubble = root.querySelector(".dg-bubble");
+  const frame = root.querySelector(".dg-visual");
+  const scale = root.querySelector(".dg-scale");
+  const targetLabel = root.querySelector(".dg-target-label");
+  positionBubbleInFrame(bubble, frame, scale, bubblePct, 8);
+  targetLabel.style.left = `${targetPct}%`;
 }
 
 // ///////////////////Contract demand//////////////////////////
@@ -1121,7 +1385,8 @@ function renderContractSizingVisual(cdWsf) {
     root.innerHTML = `
       <div class="dg-head section-heading">
         <img class="section-icon" src="buildinge_health_tool_asset/contract-demand.png" alt="Contract Demand">
-        <span class="dg-title section-title">Contract Demand (Target: &lt; 5 W/sqft):</span>
+        <span class="dg-title section-title">Contract Demand</span>
+        ${buildOutputHelp("Contract Demand is the maximum power capacity agreed with the electric utility. If it is higher than your actual need, you are paying for unused capacity; if it is lower, it can lead to penalties.")}
       </div>
       <div class="rating-fair">Result not available due to missing input(s).</div>
     `;
@@ -1132,16 +1397,13 @@ function renderContractSizingVisual(cdWsf) {
   const DOT_COUNT = 13;
   const AXIS_MAX = DOT_COUNT; // each circle = 1 W/sqft
 
-  const toPct = v => (v / AXIS_MAX) * 100;
   const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
 
   const scaledValue = clamp(cdWsf, 0, AXIS_MAX);
-  const valuePct = toPct(scaledValue);
-  const targetPct = clamp(toPct(TARGET), 0, 100);
+  const valuePct = getSizingScalePct(scaledValue, DOT_COUNT);
+  const targetPct = getSizingScalePct(TARGET, DOT_COUNT);
 
-  const firstDotPct = 100 / (DOT_COUNT * 2);
-  const lastDotPct = 100 - firstDotPct;
-  const bubblePct = clamp(valuePct, firstDotPct, lastDotPct);
+  const bubblePct = clamp(valuePct, 0, 100);
 
   const good = cdWsf <= TARGET;
   const bubbleClass = good ? "dg-good" : "dg-bad";
@@ -1154,7 +1416,8 @@ function renderContractSizingVisual(cdWsf) {
     <div class="contract-theme">
       <div class="dg-head section-heading">
         <img class="section-icon" src="buildinge_health_tool_asset/contract-demand.png" alt="Contract Demand">
-        <span class="dg-title section-title">Contract Demand (Target: &lt; 5 W/sqft):</span>
+        <span class="dg-title section-title">Contract Demand</span>
+        ${buildOutputHelp("Contract Demand is the maximum power capacity agreed with the electric utility. If it is higher than your actual need, you are paying for unused capacity; if it is lower, it can lead to penalties.")}
       </div>
 
       <div class="dg-visual">
@@ -1163,28 +1426,31 @@ function renderContractSizingVisual(cdWsf) {
           <span class="s2">Your Building ${cdWsf.toFixed(1)} W/sqft</span>
         </div>
 
-        <div class="dg-scale">
-          <div class="dg-dots">${dotsHtml}</div>
-          <div class="dg-target-marker" style="left:${targetPct}%;"></div>
-        </div>
+      <div class="dg-scale">
+        <div class="dg-dots">${dotsHtml}</div>
+        <div class="dg-target-marker" style="left:${targetPct}%;"></div>
+      </div>
 
         <div class="dg-target-label" style="left:${targetPct}%;">
-          ASSURE Target &lt; 5 W/sqft
+          ASSURE KPI &lt; 5 W/sqft
         </div>
       </div>
     </div>
   `;
+
+  const bubble = root.querySelector(".dg-bubble");
+  const frame = root.querySelector(".dg-visual");
+  const scale = root.querySelector(".dg-scale");
+  const targetLabel = root.querySelector(".dg-target-label");
+  positionBubbleInFrame(bubble, frame, scale, bubblePct, 8);
+  targetLabel.style.left = `${targetPct}%`;
 }
-
-
-
-
-
 
 /*************************************************
  * RENDER RESULTS (MATCHES HTML EXACTLY)
  *************************************************/
 function renderResults(r) {
+  latestResults = r;
 
   const beeEl = document.getElementById("outStarRating");
   const epiStarScale = document.getElementById("epiStarScale");
@@ -1262,114 +1528,92 @@ function renderResults(r) {
     }
 
     const MAX_LPCD = getNiceMax(r.lpcd);
-
-    const divisions = 5;   // 6 ticks
-    const step = MAX_LPCD / divisions;
-
     const actualPct = Math.min((r.lpcd / MAX_LPCD) * 100, 100);
-    const actualLabelPct = Math.min(Math.max(actualPct, 8), 88);
+    const actualLabelPct = Math.min(Math.max(actualPct * 0.48, 16), 58);
     const targetPctRaw = (TARGET / MAX_LPCD) * 100;
-
-    // Ensure 45 line always visible
     const targetPct = targetPctRaw < 3 ? 3 : targetPctRaw;
 
-    /* ========= BUILD SCALE ========= */
-    let scaleValues = [];
+      /* ========= SPLIT COLOR FILL ========= */
 
-    for (let i = 0; i <= divisions; i++) {
-      scaleValues.push(Math.round(i * step));
-    }
+        const bluePct = (TARGET / MAX_LPCD) * 100;
+        const redPct = Math.max(actualPct - bluePct, 0);
 
-    if (!scaleValues.includes(TARGET) && TARGET < MAX_LPCD) {
-      scaleValues.push(TARGET);
-    }
-
-    scaleValues = [...new Set(scaleValues)].sort((a, b) => b - a);
-
-    let scaleHtml = "";
-
-    scaleValues.forEach(val => {
-      const pct = (val / MAX_LPCD) * 100;
-
-      scaleHtml += `
-        <div class="scale-row ${val === TARGET ? 'scale-target' : ''}"
-            style="bottom:${pct}%">
-          <div class="scale-line"></div>
-          <span class="scale-num">${val}</span>
-          ${val === TARGET ? `<div class="scale-label">(NBC) limit: 45 lpcd</div>` : ``}
-        </div>
-      `;
-    });
-
-    /* ========= SPLIT COLOR FILL ========= */
-
-    const bluePct = (TARGET / MAX_LPCD) * 100;
-    const redPct = actualPct - bluePct;
-
-    const fillHtml = r.lpcd <= TARGET
-      ? `
-          <!-- FULL BLUE -->
-          <div class="water-actual"
-              style="height:${actualPct}%;
-                      background:linear-gradient(to top, #60a5fa, #3b82f6);">
-          </div>
-        `
-      : `
-          <!-- BLUE BELOW 45 -->
+        const fillHtml = r.lpcd <= TARGET
+          ? `
+              <!-- FULL BLUE -->
+              <div class="water-actual"
+                  style="height:${actualPct}%;
+                          background:linear-gradient(to top, #60a5fa, #3b82f6);">
+              </div>
+            `
+        : `
+            <!-- BLUE BELOW 45 -->
           <div style="
-            position:absolute;
-            bottom:0;
-            width:100%;
-            height:${bluePct}%;
-            background:linear-gradient(to top, #60a5fa, #3b82f6);
+              position:absolute;
+              bottom:0;
+              width:100%;
+              height:${bluePct}%;
+              background:linear-gradient(to top, #60a5fa, #3b82f6);
           "></div>
 
           <!-- RED ABOVE 45 -->
           <div style="
-            position:absolute;
-            bottom:${bluePct}%;
-            width:100%;
-            height:${redPct}%;
-            background:linear-gradient(to top, #ef4444, #dc2626);
+              position:absolute;
+              bottom:${bluePct}%;
+              width:100%;
+              height:${redPct}%;
+              background:linear-gradient(to top, #ef4444, #dc2626);
           "></div>
         `;
 
-    waterContainer.innerHTML = `
-      <div class="water-card">
+      waterContainer.innerHTML = `
+        <div class="water-card">
 
-        <div class="water-title section-heading">
-          <img class="section-icon" src="buildinge_health_tool_asset/water.png" alt="Water Efficiency">
-          <span class="section-title">Water Efficiency (NBC limit: 45 lpcd)</span>
-        </div>
-
-        <div class="water-wrapper">
-          <!-- CYLINDER -->
-          <div class="water-cylinder">
-
-            ${fillHtml}
-
-            <!-- LIMIT LINE -->
-            <div class="water-limit-band"
-                style="bottom:${targetPct}%">
-            </div>
-
-            <!-- ACTUAL LABEL INSIDE CYLINDER -->
-            <div class="water-actual-label"
-                style="bottom:${actualLabelPct}%;
-                        color:${r.lpcd > TARGET ? '#FFFFFF' : '#22c55e'}">
-              Actual: ${r.lpcd.toFixed(1)} lpcd
-            </div>
-
+          <div class="water-title section-heading">
+           <img class="section-icon" src="buildinge_health_tool_asset/water.png" alt="Water Efficiency">
+           <span class="section-title">Water Efficiency </span>
+           ${buildOutputHelp("Water Efficiency indicates the average amount of water used per person per day (lpcd). Lower values mean better efficiency and reduced water consumption, while higher values indicate increased usage and potential wastage.")}
           </div>
 
-          <!-- SCALE (RIGHT SIDE) -->
-          <div class="water-scale">
-            ${scaleHtml}
-          </div>
+          <div class="water-wrapper">
+            <div class="water-tank-wrap">
+              <div class="water-tank-cap" aria-hidden="true"></div>
+              <div class="water-cylinder">
+                <div class="water-tank-outline" aria-hidden="true"></div>
+                <div class="water-tank-glow" aria-hidden="true"></div>
 
+                ${fillHtml}
+
+                <!-- LIMIT LINE -->
+                <div class="water-limit-band"
+                    style="bottom:${targetPct}%">
+                </div>
+
+                  <!-- ACTUAL LABEL INSIDE TANK -->
+                  <div class="water-actual-label"
+                     style="bottom:${actualLabelPct}%">
+                    <span class="water-actual-value">${r.lpcd.toFixed(1)}</span>
+                    <span class="water-actual-unit">lpcd</span>
+                  </div>
+
+                  <div class="water-status-chip ${r.lpcd <= TARGET ? "is-good" : "is-alert"}">
+                    ${r.lpcd <= TARGET ? "Within NBC limit 45" : "Above NBC limit 45"}
+                  </div>
+
+                </div>
+
+                <div class="water-limit-overlay" aria-hidden="true">
+                  <div class="water-limit-label"
+                      style="bottom:${targetPct}%">
+                    NBC limit: 45
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    `;
+      `;
 
   } else {
 
@@ -1378,7 +1622,8 @@ function renderResults(r) {
 
         <div class="water-title section-heading">
           <img class="section-icon" src="buildinge_health_tool_asset/water.png" alt="Water Efficiency">
-          <span class="section-title">Water Efficiency (NBC limit: 45 lpcd)</span>
+          <span class="section-title">Water Efficiency </span>
+          ${buildOutputHelp("Water Efficiency indicates the average amount of water used per person per day (lpcd). Lower values mean better efficiency and reduced water consumption, while higher values indicate increased usage and potential wastage.")}
         </div>
 
         <div style="padding:20px; color:#fbbf24;">
@@ -1412,12 +1657,13 @@ function renderResults(r) {
 
 
   /* ================= SHOW RESULTS ================= */
-  const resultsEl = document.getElementById("results");
-  resultsEl.classList.remove("hidden");
+  setResultsVisibility(true);
 
-  resultsEl.classList.remove("results-refresh");
-  void resultsEl.offsetWidth; // force reflow
-  resultsEl.classList.add("results-refresh");
+  if (resultsSection) {
+    resultsSection.classList.remove("results-refresh");
+    void resultsSection.offsetWidth; // force reflow
+    resultsSection.classList.add("results-refresh");
+  }
 }
 
 
